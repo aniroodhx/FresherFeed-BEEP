@@ -26,8 +26,6 @@ def api_jobs(q: str = "", role: str = "", city: str = ""):
 def home(request: Request):
     rows = db.all_jobs()
     roles = sorted({j["role_tag"] for j in rows if j["role_tag"]})
-    cities = sorted({j["city_tag"] for j in rows if j["city_tag"] and j["city_tag"]!="unknown"})
-    return templates.TemplateResponse("index.html",
-        {"request": request, "count": len(rows), "roles": roles, "cities": cities})
-
-# run:  uvicorn app:app --reload
+    cities = sorted({j["city_tag"] for j in rows if j["city_tag"] and j["city_tag"] != "unknown"})
+    return templates.TemplateResponse(request, "index.html",
+        {"count": len(rows), "roles": roles, "cities": cities})
