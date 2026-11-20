@@ -1,0 +1,25 @@
+name: daily-refresh
+# Runs the full pipeline once a day and commits the refreshed jobs.db.
+on:
+  schedule:
+    - cron: "30 1 * * *"   # 01:30 UTC = 07:00 IST daily
+  workflow_dispatch: {}      # lets you trigger it by hand too
+
+jobs:
+  refresh:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: { python-version: "3.12" }
+      - run: pip install -r requirements.txt
+      - env:
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+        run: python pipeline.py
+      - name: commit refreshed db
+        run: |
+          git config user.name  "beep-bot"
+          git config user.email "bot@users.noreply.github.com"
+          git add jobs.db
+          git commit -m "daily refresh" || echo "no changes"
+          git push

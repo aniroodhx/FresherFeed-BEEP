@@ -1,0 +1,44 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8"><title>Fresher Jobs India</title>
+<style>
+  body{font-family:system-ui,sans-serif;max-width:880px;margin:2rem auto;padding:0 1rem}
+  h1{margin-bottom:.2rem}.muted{color:#666}
+  .controls{display:flex;gap:.5rem;flex-wrap:wrap;margin:1rem 0}
+  input,select{padding:.5rem;border:1px solid #ccc;border-radius:6px}
+  .card{border:1px solid #eee;border-radius:8px;padding:.8rem 1rem;margin:.5rem 0}
+  .tags span{font-size:.75rem;background:#eef;border-radius:10px;padding:.1rem .5rem;margin-right:.3rem}
+  a{text-decoration:none;color:#1a56db}
+</style>
+</head>
+<body>
+  <h1>Fresher & Internship Jobs - India</h1>
+  <p class="muted"><b id="n">{{count}}</b> live posts · auto-refreshes daily · tags by AI (classify-only)</p>
+  <div class="controls">
+    <input id="q" placeholder="search title / company" oninput="load()">
+    <select id="role" onchange="load()"><option value="">All roles</option>
+      {% for r in roles %}<option>{{r}}</option>{% endfor %}</select>
+    <select id="city" onchange="load()"><option value="">All cities</option>
+      {% for c in cities %}<option>{{c}}</option>{% endfor %}</select>
+  </div>
+  <div id="list"></div>
+<script>
+async function load(){
+  const q=document.getElementById('q').value,
+        role=document.getElementById('role').value,
+        city=document.getElementById('city').value;
+  const res=await fetch(`/api/jobs?q=${encodeURIComponent(q)}&role=${encodeURIComponent(role)}&city=${encodeURIComponent(city)}`);
+  const jobs=await res.json();
+  document.getElementById('n').textContent=jobs.length;
+  document.getElementById('list').innerHTML=jobs.map(j=>`
+    <div class="card">
+      <a href="${j.url}" target="_blank"><b>${j.title}</b></a> - ${j.company}
+      <div class="tags"><span>${j.role_tag||'?'}</span><span>${j.city_tag||'?'}</span>
+        <span class="muted">${j.source}</span></div>
+    </div>`).join('');
+}
+load();
+</script>
+</body>
+</html>
